@@ -21,18 +21,37 @@ def splitEquasion(equasion_as_string):                                          
 
     lasttype = ""                                                                   # the chartype (getType()) from the last checked char
     currenttype = ""                                                                # the crurrent checked chartype (getType())
+
+    # >>> remove SPACE <<<
+    indexcorrection = 0
+    for i in range(0, len(string)):                                                 # for every char in the string except the first
+        i = i + indexcorrection
+        lasttype = currenttype                                                      # the currenttype from the last run of the for-loop will now become
+        currenttype = getType(str(string[i]))                                       # getting a new currenttype from a char with the getType() function from the equasion string
+        if (currenttype == "space"):
+            string = string[:i] + string[i+1:]
+            indexcorrection = indexcorrection -1
+
+    # >>> 2x -> 2*x <<<
+    currenttype = getType(str(string[0]))                                           # the first char haven't to compared with the one before, because there is no one before :D
+    indexcorrection = 0
+    for i in range(1, len(string)):                                                 # for every char in the string except the first
+        i = i + indexcorrection
+        lasttype = currenttype                                                      # the currenttype from the last run of the for-loop will now become
+        currenttype = getType(str(string[i]))                                       # getting a new currenttype from a char with the getType() function from the equasion string
+        if (currenttype == "variable") and (lasttype == "number"):
+            string = str(string[:i]) + "*" + str(string[i:])
+            indexcorrection = indexcorrection + 1
+
+    # >>> interprete to list <<<
     equasionindex = 0                                                               # the index of the last added entry to the equasion list
     equasion = []                                                                   # declaring the equasion list
-
     currenttype = string[0]                                                         # the first char haven't to compared with the one before, because there is no one before :D
     equasion.append(str(string[0]))                                                 # ...and will be direcly a new entry in the equasionlist
-
     for i in range(1, len(string)):                                                 # for every char in the string except the first
         lasttype = currenttype                                                      # the currenttype from the last run of the for-loop will now become
         currenttype = getType(str(string[i]))                                       # getting a new currenttype from a char with the getType() function from the equasion string
-        if currenttype == "space":                                                  # checking if the currenttype is "space" and ...
-            continue                                                                # ...doing nothing, because spaces should be ignored
-        elif getType(equasion[equasionindex][-1]) == getType(string[i]):            # when the current and last chartype is equal to each other...
+        if getType(equasion[equasionindex][-1]) == getType(string[i]):              # when the current and last chartype is equal to each other...
             equasion[equasionindex] = str(equasion[equasionindex]) + str(string[i]) # ...add the current char to the last entry in the equasionlist
         else:                                                                       # when it's an other type of char is should...
             equasion.append(str(string[i]))                                         # ...create a new entry in the equasionlist with the current char
@@ -44,7 +63,7 @@ def splitEquasion(equasion_as_string):                                          
 def getType(char):                                                                  # returns the type of a char
     char = str(char)                                                                # only strings will get a match
 
-    #number
+    #numbers
     if char == "0":
         return "number"
     elif char == "1":
@@ -70,7 +89,7 @@ def getType(char):                                                              
     elif char == ".":
         return "number"
 
-    #action
+    #actions
     elif char == "*":
         return "action"
     elif char == "/":
@@ -84,13 +103,13 @@ def getType(char):                                                              
     elif char == "%":
         return "action"
 
-    #bracket
+    #brackets
     elif char == "(":
         return "bracket"
     elif char == ")":
         return "bracket"
 
-    #variable
+    #variables
     elif char == "a":
         return "variable"
     elif char == "b":
@@ -155,20 +174,39 @@ def getType(char):                                                              
 def solveEquasion(equasion_as_list):                                                # solving an equasion (recursive, because of brackets)
     equasion = equasion_as_list                                                     # code will look cleaner with shorter variables
 
+    # >>> replace variables <<<
+    lasttype = ""                                                                   # the chartype (getType()) from the last checked char
+    currenttype = ""                                                                # the crurrent checked chartype (getType())
+    for equasionIndex in range(0, len(equasion)):                                   # for every entry in the equasion
+        foundVariable = False
+        lasttype = currenttype                                                      # the currenttype from the last run of the for-loop will now become
+        currenttype = getType(str(equasion[equasionIndex])[0])                      # getting a new currenttype from a char with the getType() function from the equasion string
+        if currenttype == "variable":                                               # found variable
+            for variablesIndex  in range(0, len(variables)):                        # searcj for definition in the variable slist
+                if foundVariable == True:
+                    continue
+                else:
+                    if variables[variablesIndex][0] == equasion[equasionIndex]:
+                        equasion[equasionIndex] = variables[variablesIndex][1]
+                        foundVariable = True
+            if foundVariable == False:                                              # if there is no definition
+                print("Variable ", equasion[equasionIndex], " is not defined. It will be handled as 1.")
+                equasion[equasionIndex] = 1
+
+    # >>> solve brackets <<<
     bracket = 0
     for n in range(0, len(equasion)):                                               # every entry in the equasionlist will be checked for brackets
         if equasion[n] == "(":
             bracket = bracket + 1
         if equasion[n] == ")":
             bracket = bracket + 1
-
-    if bracket > 0:                                                                 #if there are brackets
-        for missions in range(0,bracket//2):                                        #In every mission one bracket pair will be solved
+    if bracket > 0:                                                                 # if there are brackets
+        for missions in range(0,bracket//2):                                        # In every mission one bracket pair will be solved
             missionCompleted = False
             leftBracket = 0
             rightBracket = 0
-            sublist = []
-            for index in range(0, len(equasion)):                                   #checking every entry in the equasionlist
+            subequasion = []
+            for index in range(0, len(equasion)):                                   # checking every entry in the equasionlist
                 if missionCompleted == True:                                        # the program should not keep sereaching in the equasion whis in this mission already one bracket pair was solved
                     continue
                 else:                                                               # when the mission is still searching for one bracket pair
@@ -184,13 +222,13 @@ def solveEquasion(equasion_as_list):                                            
                             equasion.pop(leftBracket)
                         missionCompleted = True                                     # One bracket pair was solved so the next scanned indexed (above) will be skipped
 
+    # >>> analyse the equasion <<<
     minus = 0                                                                       # declaring the variables vor each action char
     plus = 0                                                                        # with every found action char in the equasion the accordingly variable will get +1
     multiply = 0
     divide = 0
     percent = 0
     power = 0
-
     for n in range(0, len(equasion)):                                               # every entry in the equasionlistwill be checked
         if equasion[
             n] == "%":                                                              # from here if there is a matching char the accordingly variable will get +1
@@ -206,7 +244,7 @@ def solveEquasion(equasion_as_list):                                            
         if equasion[n] == "-":
             minus = minus + 1
 
-    # % percent                                                                       >>> solve PERCENT % <<<
+    # >>> solver percent % <<<                                                        >>> solve PERCENT % <<<
     if percent > 0:                                                                 # Every mission will solve one compute-sign
         for missions in range(0,percent):                                           # for every counted percent char
             missionCompleted = False                                                # declaring
@@ -297,13 +335,17 @@ def solveEquasion(equasion_as_list):                                            
 
     return equasion
 
+global variables                                                                    # global variable to save all custom ariable definitions
+variables = []
+def setVariable(variable, value):
+    for index in range(0, len(variables)):                                          # pop all other definition for this variable
+        if variables[index] == variable:
+            variables.pop(index)
+    variables.append([variable, value])                                             # write the difinition into the list
+
+
 if __name__ == "__main__":
     showBanner()
     while True:
-
-        try:
-            print("")
-            solve = solveEquasion(splitEquasion(str(input("enter equasion: "))))[0]
-            print(" f() = " ,solve)
-        except Exception as e:
-            print("ERROR!: ", e)
+        print("")
+        print("f() = " ,solveEquasion(splitEquasion(str(input("enter equasion: "))))[0])
