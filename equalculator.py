@@ -1,5 +1,5 @@
 #first edit: 2017-09-11
-#last edit: 2017-09-15
+#last edit: 2017-09-18
 #last edit from: github.com/Phyyyl
 
 def showBanner():                                                                   # Cool Banner will be printed. Created with network-science.de/ascii/
@@ -9,13 +9,13 @@ def showBanner():                                                               
         print("     /  __/ /_/ // /_/ // /_/ /_  / / /__ / /_/ /_  / / /_/ // /_ / /_/ /  /")
         print("     \___/\__, / \__,_/ \__,_/ /_/  \___/ \__,_/ /_/  \__,_/ \__/ \____//_/")
         print("            /_/")
-        print("                   github.com/Phyyyl/py-equalculator    v1.0 ")
+        print("                   github.com/Phyyyl/py-equalculator    v1.2 ")
 
 def inputPrompt():                                                                  # when executed the user is able to type in an equasion
     equasion = input("Enter Equasion")
     return equasion                                                                 # returns the input without manipulation
 
-def splitEquasion(equasion_as_string):                                              # splits a equasion in a string into different parts
+def interpreteEquasion(equasion_as_string):                                         # splits a equasion in a string into different parts
     string = equasion_as_string                                                     # code will look cleaner with shorter variables
    #equasion = equasion_as_list                                                     # code will look cleaner with shorter variables
 
@@ -43,6 +43,83 @@ def splitEquasion(equasion_as_string):                                          
             string = str(string[:i]) + "*" + str(string[i:])
             indexcorrection = indexcorrection + 1
 
+    # >>> negative number marking -1 -> €1   -x -> $x<<<
+    lasttype2 = "nothing"
+    lasttype = "nothing"
+    currenttype = "nothing"
+    currentchar = ""
+    lastchar = ""
+    lastchar2 = ""
+    indexcorrection = 0
+    for i in range(0, len(string)):
+        i = i + indexcorrection
+        lasttype2 = lasttype
+        lasttype = currenttype
+        print("index "+ str(i) + " von "+ str(len(string)))
+        currenttype = getType(string[i])
+        lastchar2 = lastchar
+        lastchar = currentchar
+        currentchar = string[i]
+        variableInnterruption = False
+        numberInterruption = False
+        numberLenght = 1
+        variableLenght = 1
+        stringFragment1 = "("
+        stringFragment2 = ""
+        stringFragment3 = ")"
+        if (currenttype == "variable") and (lastchar == "-"):
+            if (lasttype2 == "action") or (lasttype2 == "nothing"):
+                print(string)
+                for lenght in range(i, len(string)-i):
+                    if variableInnterruption == False:
+                        if getType(string[lenght]) == "variable":
+                            variableLenght = variableLenght + 1
+                        else:
+                            variableInnterruption = True
+                    else:
+                        continue
+                try:
+                    stringFragment1 = string[:i-1] + "("
+                except Exception as e:
+                    continue
+                try:
+                    stringFragment2 =  "$" + string[i:i+variableLenght]
+                except Exception as e:
+                    continue
+                try:
+                    stringFragment3 = ")" + string[i+variableLenght:]
+                except Exception as e:
+                    continue
+                string = stringFragment1 + stringFragment2 + stringFragment3
+                indexcorrection = indexcorrection + 2
+        elif (currenttype == "number") and (lastchar == "-"):
+            if (lastchar2 == "(") or (lasttype2 == "action"):
+                for lenght in range(i, len(string)-i):
+                    if numberInterruption == False:
+                        if getType(string[lenght]) == "number":
+                            numberLenght = numberLenght + 1
+                        else:
+                            numberInnterruption = True
+                    else:
+                        continue
+                try:
+                    stringFragment1 = string[:i-2] + "("
+                except Exception as e:
+                    continue
+                try:
+                    stringFragment2 =  "€" + string[i:i+numberLenght]
+                except Exception as e:
+                    continue
+                try:
+                    stringFragment3 = ")" + string[i+numberLenght:]
+                except Exception as e:
+                    continue
+                string = stringFragment1 + stringFragment2 + stringFragment3
+                indexcorrection = indexcorrection + 2
+        else:
+            continue
+    print(string)
+
     # >>> interprete to list <<<
     equasionindex = 0                                                               # the index of the last added entry to the equasion list
     equasion = []                                                                   # declaring the equasion list
@@ -51,11 +128,25 @@ def splitEquasion(equasion_as_string):                                          
     for i in range(1, len(string)):                                                 # for every char in the string except the first
         lasttype = currenttype                                                      # the currenttype from the last run of the for-loop will now become
         currenttype = getType(str(string[i]))                                       # getting a new currenttype from a char with the getType() function from the equasion string
-        if getType(equasion[equasionindex][-1]) == getType(string[i]):              # when the current and last chartype is equal to each other...
+        if getType(string[i]) == "bracket":
+            equasion.append(str(string[i]))                                         # ...create a new entry in the equasionlist with the current char
+            equasionindex = equasionindex + 1                                       # there is anew entry, so the programm should easily remember the highest index of the equasionlist
+        elif getType(equasion[equasionindex][-1]) == getType(string[i]):            # when the current and last chartype is equal to each other...
             equasion[equasionindex] = str(equasion[equasionindex]) + str(string[i]) # ...add the current char to the last entry in the equasionlist
         else:                                                                       # when it's an other type of char is should...
             equasion.append(str(string[i]))                                         # ...create a new entry in the equasionlist with the current char
             equasionindex = equasionindex + 1                                       # there is anew entry, so the programm should easily remember the highest index of the equasionlist
+
+    for i in range(0, len(equasion)):
+        if (equasion[i][0] == "$") or (equasion[i][0] == "€"):
+            try:
+                equasion[i] = "-" + equasion[i][1:]
+                print("replacement succeded")
+            except Exception as e:
+                print("ERROR line 149")
+                equasion[i] = "-"
+
+    print(equasion)
 
     equasion_as_list = equasion                                                     # converting back to a longer variablename to keep an order
     return equasion_as_list                                                         # the equasion interpreted to a list will get returned
@@ -88,7 +179,10 @@ def getType(char):                                                              
         return "number"
     elif char == ".":
         return "number"
-
+    elif char == "~":
+        return "number"
+    elif char == "€":
+        return "number"
     #actions
     elif char == "*":
         return "action"
@@ -162,11 +256,16 @@ def getType(char):                                                              
         return "variable"
     elif char == "z":
         return "variable"
+    elif char == "$":
+        return "variable"
 
     elif char == " ":
         return "space"
     elif char == "_":
         return "space"
+
+    elif char == "":
+        return "nothing"
 
     else:
         print("The char \"", char, "\" is not valid")
@@ -179,14 +278,17 @@ def solveEquasion(equasion_as_list):                                            
     currenttype = ""                                                                # the crurrent checked chartype (getType())
     for equasionIndex in range(0, len(equasion)):                                   # for every entry in the equasion
         foundVariable = False
+        negativeCorrection = 0
         lasttype = currenttype                                                      # the currenttype from the last run of the for-loop will now become
-        currenttype = getType(str(equasion[equasionIndex])[0])                      # getting a new currenttype from a char with the getType() function from the equasion string
+        if equasion[equasionIndex][0][0] == "-":
+            negativeCorrection = 1
+        currenttype = getType(str(equasion[equasionIndex])[0][negativeCorrection:])              # getting a new currenttype from a char with the getType() function from the equasion string
         if currenttype == "variable":                                               # found variable
             for variablesIndex  in range(0, len(variables)):                        # searcj for definition in the variable slist
                 if foundVariable == True:
                     continue
                 else:
-                    if variables[variablesIndex][0] == equasion[equasionIndex]:
+                    if variables[variablesIndex][0][negativeCorrection:] == equasion[equasionIndex]:
                         equasion[equasionIndex] = variables[variablesIndex][1]
                         foundVariable = True
             if foundVariable == False:                                              # if there is no definition
@@ -278,6 +380,7 @@ def solveEquasion(equasion_as_list):                                            
         for missions in range(0,multiply):                                          # for every counted multiplication char
             missionCompleted = False                                                # declaring
             for index in range(0, len(equasion)):                                   # check every entry of the equasion
+                print("try to get index " + str(index) + " of " + str(int(len(equasion) - 1)) + " indexes.")
                 if missionCompleted == True:                                        # skipping if the compute-sign was already found in the current mission
                     continue
                 else:                                                               # when this mission still have to find one compute-sign
@@ -345,7 +448,8 @@ def setVariable(variable, value):
 
 
 if __name__ == "__main__":
-    showBanner()
+    setVariable("x", 2)
+    print(solveEquasion(interpreteEquasion("(-6)*(4+5)")))
     while True:
         print("")
-        print("f() = " ,solveEquasion(splitEquasion(str(input("enter equasion: "))))[0])
+        print("f() = " ,solveEquasion(interpreteEquasion(str(input("enter equasion: "))))[0])
