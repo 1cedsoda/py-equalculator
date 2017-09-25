@@ -50,74 +50,93 @@ def interpreteEquasion(equasion_as_string):                                     
     currentchar = ""
     lastchar = ""
     lastchar2 = ""
-    indexcorrection = 0
-    for i in range(0, len(string)):
-        i = i + indexcorrection
-        lasttype2 = lasttype
-        lasttype = currenttype
-        print("index "+ str(i) + " von "+ str(len(string)))
-        currenttype = getType(string[i])
-        lastchar2 = lastchar
-        lastchar = currentchar
-        currentchar = string[i]
-        variableInnterruption = False
-        numberInterruption = False
-        numberLenght = 1
-        variableLenght = 1
-        stringFragment1 = "("
-        stringFragment2 = ""
-        stringFragment3 = ")"
-        if (currenttype == "variable") and (lastchar == "-"):
-            if (lasttype2 == "action") or (lasttype2 == "nothing"):
-                print(string)
-                for lenght in range(i, len(string)-i):
-                    if variableInnterruption == False:
-                        if getType(string[lenght]) == "variable":
-                            variableLenght = variableLenght + 1
+    maxIndex = len(string)-1
+    i = 0
+    finished = False
+    while finished == False:
+        if (i == maxIndex) or (i < maxIndex):
+            lasttype2 = lasttype
+            lasttype = currenttype
+            print(string)
+            for o in range(0, len(string)):
+                print(str(o)[-1], end="")
+            print("")
+            for z in range(0, len(string)):
+                if i == z:
+                    print("^", end="")
+                else:
+                    print(" ", end="")
+            print("")
+            currenttype = getType(string[i])
+            lastchar2 = lastchar
+            lastchar = currentchar
+            currentchar = string[i]
+            variableInnterruption = False
+            numberInterruption = False
+            numberLenght = 1
+            variableLenght = 1
+            stringFragment1 = "("
+            stringFragment2 = ""
+            stringFragment3 = ")"
+            if (currenttype == "variable") and (lastchar == "-"):
+                if (lastchar2 == "(") or (lasttype2 == "action") or (lasttype2 == "nothing"):
+                    print(string)
+                    for lenght in range(i, len(string)-i):
+                        if variableInnterruption == False:
+                            if getType(string[lenght]) == "variable":
+                                variableLenght = variableLenght + 1
+                            else:
+                                variableInnterruption = True
                         else:
-                            variableInnterruption = True
-                    else:
+                            continue
+                    try:
+                        stringFragment1 = string[:i-1] + "("
+                    except Exception as e:
                         continue
-                try:
-                    stringFragment1 = string[:i-1] + "("
-                except Exception as e:
-                    continue
-                try:
-                    stringFragment2 =  "$" + string[i:i+variableLenght]
-                except Exception as e:
-                    continue
-                try:
-                    stringFragment3 = ")" + string[i+variableLenght:]
-                except Exception as e:
-                    continue
-                string = stringFragment1 + stringFragment2 + stringFragment3
-                indexcorrection = indexcorrection + 2
-        elif (currenttype == "number") and (lastchar == "-"):
-            if (lastchar2 == "(") or (lasttype2 == "action"):
-                for lenght in range(i, len(string)-i):
-                    if numberInterruption == False:
-                        if getType(string[lenght]) == "number":
-                            numberLenght = numberLenght + 1
+                    try:
+                        stringFragment2 =  "$" + string[i:i+variableLenght]
+                    except Exception as e:
+                        continue
+                    try:
+                        stringFragment3 = ")" + string[i+variableLenght:]
+                    except Exception as e:
+                        continue
+                    string = stringFragment1 + stringFragment2 + stringFragment3
+                    i = i + 1
+                    maxIndex = len(string)-1
+
+            elif (currenttype == "number") and (lastchar == "-"):
+                if (lastchar2 == "(") or (lasttype2 == "action") or (lasttype2 == "nothing"):
+                    for lenght in range(i, len(string)-i):
+                        if numberInterruption == False:
+                            if getType(string[lenght]) == "number":
+                                numberLenght = numberLenght + 1
+                            else:
+                                numberInnterruption = True
                         else:
-                            numberInnterruption = True
-                    else:
+                            continue
+                    try:
+                        stringFragment1 = string[:i-1] + "("
+                    except Exception as e:
                         continue
-                try:
-                    stringFragment1 = string[:i-2] + "("
-                except Exception as e:
-                    continue
-                try:
-                    stringFragment2 =  "€" + string[i:i+numberLenght]
-                except Exception as e:
-                    continue
-                try:
-                    stringFragment3 = ")" + string[i+numberLenght:]
-                except Exception as e:
-                    continue
-                string = stringFragment1 + stringFragment2 + stringFragment3
-                indexcorrection = indexcorrection + 2
+                    #print(stringFragment1)
+                    try:
+                        stringFragment2 =  "€" + string[i:i+numberLenght]
+                    except Exception as e:
+                        continue
+                    #print(stringFragment2)
+                    try:
+                        stringFragment3 = ")" + string[i+numberLenght:]
+                    except Exception as e:
+                        continue
+                    #print(stringFragment3)
+                    string = stringFragment1 + stringFragment2 + stringFragment3
+                    i = i + 1
+                    maxIndex = len(string)-1
+            else:
+                i = i + 1
         else:
-            continue
+            finished = True
     print(string)
 
     # >>> interprete to list <<<
@@ -143,8 +162,7 @@ def interpreteEquasion(equasion_as_string):                                     
                 equasion[i] = "-" + equasion[i][1:]
                 print("replacement succeded")
             except Exception as e:
-                print("ERROR line 149")
-                equasion[i] = "-"
+                continue
 
     print(equasion)
 
@@ -449,7 +467,7 @@ def setVariable(variable, value):
 
 if __name__ == "__main__":
     setVariable("x", 2)
-    print(solveEquasion(interpreteEquasion("(-6)*(4+5)")))
+    print(solveEquasion(interpreteEquasion("(-5)+(-6)+(-7)")))
     while True:
         print("")
         print("f() = " ,solveEquasion(interpreteEquasion(str(input("enter equasion: "))))[0])
