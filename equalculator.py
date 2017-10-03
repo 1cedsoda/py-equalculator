@@ -1,6 +1,6 @@
 #first edit: 2017-09-11
-#last edit: 2017-09-18
-#last edit from: github.com/Phyyyl
+#last edit: 2017-10-03
+#last edit from: github.com/phyyyl
 
 def showBanner():                                                                   # Cool Banner will be printed. Created with network-science.de/ascii/
         print("                               ______            ______      _____")
@@ -9,7 +9,7 @@ def showBanner():                                                               
         print("     /  __/ /_/ // /_/ // /_/ /_  / / /__ / /_/ /_  / / /_/ // /_ / /_/ /  /")
         print("     \___/\__, / \__,_/ \__,_/ /_/  \___/ \__,_/ /_/  \__,_/ \__/ \____//_/")
         print("            /_/")
-        print("                   github.com/Phyyyl/py-equalculator    v1.2 ")
+        print("                   github.com/phyyyl/py-equalculator    v1.2 ")
 
 def inputPrompt():                                                                  # when executed the user is able to type in an equasion
     equasion = input("Enter Equasion")
@@ -28,7 +28,7 @@ def interpreteEquasion(equasion_as_string):                                     
         i = i + indexcorrection
         lasttype = currenttype                                                      # the currenttype from the last run of the for-loop will now become
         currenttype = getType(str(string[i]))                                       # getting a new currenttype from a char with the getType() function from the equasion string
-        if (currenttype == "space"):
+        if currenttype == "space":
             string = string[:i] + string[i+1:]
             indexcorrection = indexcorrection -1
 
@@ -43,7 +43,7 @@ def interpreteEquasion(equasion_as_string):                                     
             string = str(string[:i]) + "*" + str(string[i:])
             indexcorrection = indexcorrection + 1
 
-    # >>> negative number marking -1 -> €1   -x -> $x<<<
+    # >>> negative number marking -1 -> €1   -x -> $x <<<
     lasttype2 = "nothing"
     lasttype = "nothing"
     currenttype = "nothing"
@@ -52,21 +52,11 @@ def interpreteEquasion(equasion_as_string):                                     
     lastchar2 = ""
     maxIndex = len(string)-1
     i = 0
-    finished = False
-    while finished == False:
-        if (i == maxIndex) or (i < maxIndex):
+    finished = False                                                                # these 3 lines are a ranged for loop
+    while not finished:                                                             # , which can change its lenght
+        if (i == maxIndex) or (i < maxIndex):                                       #while in work
             lasttype2 = lasttype
             lasttype = currenttype
-            print(string)
-            for o in range(0, len(string)):
-                print(str(o)[-1], end="")
-            print("")
-            for z in range(0, len(string)):
-                if i == z:
-                    print("^", end="")
-                else:
-                    print(" ", end="")
-            print("")
             currenttype = getType(string[i])
             lastchar2 = lastchar
             lastchar = currentchar
@@ -78,66 +68,62 @@ def interpreteEquasion(equasion_as_string):                                     
             stringFragment1 = "("
             stringFragment2 = ""
             stringFragment3 = ")"
+
             if (currenttype == "variable") and (lastchar == "-"):
-                if (lastchar2 == "(") or (lasttype2 == "action") or (lasttype2 == "nothing"):
-                    print(string)
-                    for lenght in range(i, len(string)-i):
-                        if variableInnterruption == False:
+                if (lastchar2 == "(") or (lasttype2 == "action") or (lasttype2 == "nothing"): #detecting if the current index is an negative variable
+                    for lenght in range(i+1, len(string)-i+1):                      #scanning all chars after the variable
+                        if not variableInnterruption:
                             if getType(string[lenght]) == "variable":
-                                variableLenght = variableLenght + 1
+                                variableLenght = variableLenght + 1                 #detecting the lenght of the variable
                             else:
                                 variableInnterruption = True
                         else:
                             continue
-                    try:
+                    try:                                                            #now the equasion string will parted in thre fragments
                         stringFragment1 = string[:i-1] + "("
                     except Exception as e:
                         continue
                     try:
-                        stringFragment2 =  "$" + string[i:i+variableLenght]
+                        stringFragment2 =  "$" + string[i:i+variableLenght]         #the negative minus char will be replaced by an $ sign
                     except Exception as e:
                         continue
                     try:
                         stringFragment3 = ")" + string[i+variableLenght:]
                     except Exception as e:
                         continue
-                    string = stringFragment1 + stringFragment2 + stringFragment3
-                    i = i + 1
-                    maxIndex = len(string)-1
+                    string = stringFragment1 + stringFragment2 + stringFragment3    #now the equasion string get assembled by thee fragments
+                    i = i + 1                                                       #part of the raged for(while) loop
+                    maxIndex = len(string)-1                                        #updating the lenght of the string for the ranged for(while) loop
 
             elif (currenttype == "number") and (lastchar == "-"):
-                if (lastchar2 == "(") or (lasttype2 == "action") or (lasttype2 == "nothing"):
-                    for lenght in range(i, len(string)-i):
-                        if numberInterruption == False:
+                if (lastchar2 == "(") or (lasttype2 == "action") or (lasttype2 == "nothing"): #detecting if the current index is an negative number
+                    for lenght in range(i+1, len(string)-i+1):                      #scanning all chars after the number
+                        if not numberInterruption:
                             if getType(string[lenght]) == "number":
-                                numberLenght = numberLenght + 1
+                                numberLenght = numberLenght + 1                     #detecting the lenght of the variable
                             else:
-                                numberInnterruption = True
+                                numberInterruption = True
                         else:
                             continue
-                    try:
+                    try:                                                            #now the equasion string will parted in thre fragments
                         stringFragment1 = string[:i-1] + "("
                     except Exception as e:
                         continue
-                    #print(stringFragment1)
                     try:
-                        stringFragment2 =  "€" + string[i:i+numberLenght]
+                        stringFragment2 =  "€" + string[i:i+numberLenght]           #the negative minus char will be replaced by an € sign
                     except Exception as e:
                         continue
-                    #print(stringFragment2)
                     try:
                         stringFragment3 = ")" + string[i+numberLenght:]
                     except Exception as e:
                         continue
-                    #print(stringFragment3)
-                    string = stringFragment1 + stringFragment2 + stringFragment3
-                    i = i + 1
-                    maxIndex = len(string)-1
+                    string = stringFragment1 + stringFragment2 + stringFragment3    #now the equasion string get assembled by thee fragments
+                    i = i + 1                                                       #part of the raged for(while) loop
+                    maxIndex = len(string)-1                                        #updating the lenght of the string for the ranged for(while) loop
             else:
-                i = i + 1
+                i = i + 1                                                           #part of the raged for(while) loop
         else:
             finished = True
-    print(string)
 
     # >>> interprete to list <<<
     equasionindex = 0                                                               # the index of the last added entry to the equasion list
@@ -156,15 +142,19 @@ def interpreteEquasion(equasion_as_string):                                     
             equasion.append(str(string[i]))                                         # ...create a new entry in the equasionlist with the current char
             equasionindex = equasionindex + 1                                       # there is anew entry, so the programm should easily remember the highest index of the equasionlist
 
-    for i in range(0, len(equasion)):
+    for i in range(0, len(equasion)):                                               #replacing € and $ with -
         if (equasion[i][0] == "$") or (equasion[i][0] == "€"):
             try:
                 equasion[i] = "-" + equasion[i][1:]
-                print("replacement succeded")
             except Exception as e:
                 continue
 
-    print(equasion)
+    for i in range(0, len(equasion)):                                               #replacing € and $ with -
+        if (getType(str(equasion[i][-1])) == "action") and (len(equasion[i]) > 1):
+            try:
+                equasion[i] = equasion[i][-1]
+            except Exception as e:
+                continue
 
     equasion_as_list = equasion                                                     # converting back to a longer variablename to keep an order
     return equasion_as_list                                                         # the equasion interpreted to a list will get returned
@@ -303,13 +293,13 @@ def solveEquasion(equasion_as_list):                                            
         currenttype = getType(str(equasion[equasionIndex])[0][negativeCorrection:])              # getting a new currenttype from a char with the getType() function from the equasion string
         if currenttype == "variable":                                               # found variable
             for variablesIndex  in range(0, len(variables)):                        # searcj for definition in the variable slist
-                if foundVariable == True:
+                if foundVariable:
                     continue
                 else:
                     if variables[variablesIndex][0][negativeCorrection:] == equasion[equasionIndex]:
                         equasion[equasionIndex] = variables[variablesIndex][1]
                         foundVariable = True
-            if foundVariable == False:                                              # if there is no definition
+            if not foundVariable:                                              # if there is no definition
                 print("Variable ", equasion[equasionIndex], " is not defined. It will be handled as 1.")
                 equasion[equasionIndex] = 1
 
@@ -327,17 +317,20 @@ def solveEquasion(equasion_as_list):                                            
             rightBracket = 0
             subequasion = []
             for index in range(0, len(equasion)):                                   # checking every entry in the equasionlist
-                if missionCompleted == True:                                        # the program should not keep sereaching in the equasion whis in this mission already one bracket pair was solved
+                if missionCompleted:                                                # the program should not keep sereaching in the equasion whis in this mission already one bracket pair was solved
                     continue
                 else:                                                               # when the mission is still searching for one bracket pair
                     if equasion[index] == "(":                                      # when it's a left bracket...
                         leftBracket = index                                         # ...the index will be saved
                     elif equasion[index] == ")":                                    # if it's a right bracket it will solve the part in between the last left bracket and the current one
                         rightBracket = index                                        # the index will be saved
-                        for n in range(leftBracket+1,index):                        # every entry in between will be appendet to list, whick will be recursed tho the solveEquasion() funcion
-                            subequasion.append(equasion[n])
+                        if leftBracket + 1 == rightBracket - 1:
+                            subequasion.append(equasion[leftBracket+1])
+                        else:
+                            for n in range(leftBracket + 1, rightBracket):          # every entry in between will be appendet to list, which will be recursed tho the solveEquasion() funcion
+                                subequasion.append(equasion[n])
                         subresult = solveEquasion(subequasion)                      # recusing the subequasion to the solveEquasion() funcion
-                        equasion[rightBracket] = subresult[0]                       # replacing the result with the right bracket
+                        equasion[rightBracket] = (subresult)[0]                     # replacing the result with the right bracket
                         for n in range(leftBracket+1, rightBracket+1):              # poping the left bracket and everything inbetween the two brackets
                             equasion.pop(leftBracket)
                         missionCompleted = True                                     # One bracket pair was solved so the next scanned indexed (above) will be skipped
@@ -369,7 +362,7 @@ def solveEquasion(equasion_as_list):                                            
         for missions in range(0,percent):                                           # for every counted percent char
             missionCompleted = False                                                # declaring
             for index in range(0, len(equasion)):                                   # check every entry of the equasion
-                if missionCompleted == True:                                        # skipping if the compute-sign was already found in the current mission
+                if missionCompleted:                                                # skipping if the compute-sign was already found in the current mission
                     continue
                 else:                                                               # when this mission still have to find one compute-sign
                     if equasion[index] == "%":                                      # executed when a percent char was found
@@ -383,7 +376,7 @@ def solveEquasion(equasion_as_list):                                            
         for missions in range(0,power):                                             # for every counted power char
             missionCompleted = False                                                # declaring
             for index in range(0, len(equasion)):                                   # check every entry of the equasion
-                if missionCompleted == True:                                        # skipping if the compute-sign was already found in the current mission
+                if missionCompleted:                                                # skipping if the compute-sign was already found in the current mission
                     continue
                 else:                                                               # when this mission still have to find one compute-sign
                     if equasion[index] == "^":                                      # executed when a power char was found
@@ -398,8 +391,7 @@ def solveEquasion(equasion_as_list):                                            
         for missions in range(0,multiply):                                          # for every counted multiplication char
             missionCompleted = False                                                # declaring
             for index in range(0, len(equasion)):                                   # check every entry of the equasion
-                print("try to get index " + str(index) + " of " + str(int(len(equasion) - 1)) + " indexes.")
-                if missionCompleted == True:                                        # skipping if the compute-sign was already found in the current mission
+                if missionCompleted:                                                # skipping if the compute-sign was already found in the current mission
                     continue
                 else:                                                               # when this mission still have to find one compute-sign
                     if equasion[index] == "*":                                      # executed when a multiplication char was found
@@ -414,7 +406,7 @@ def solveEquasion(equasion_as_list):                                            
         for missions in range(0,divide):                                            # for every counted dividation char
             missionCompleted = False                                                # declaring
             for index in range(0, len(equasion)):                                   # check every entry of the equasion
-                if missionCompleted == True:                                        # skipping if the compute-sign was already found in the current mission
+                if missionCompleted:                                                # skipping if the compute-sign was already found in the current mission
                     continue
                 else:                                                               # when this mission still have to find one compute-sign
                     if equasion[index] == "/":                                      # executed when a dividation char was found
@@ -429,7 +421,7 @@ def solveEquasion(equasion_as_list):                                            
         for missions in range(0,plus):                                              # for every counted plus
             missionCompleted = False                                                # declaring
             for index in range(0, len(equasion)):                                   # check every entry of the equasion
-                if missionCompleted == True:                                        # skipping if the compute-sign was already found in the current mission
+                if missionCompleted:                                                # skipping if the compute-sign was already found in the current mission
                     continue
                 else:                                                               # when this mission still have to find one compute-sign
                     if equasion[index] == "+":                                      # executed when a plus char was found
@@ -444,17 +436,24 @@ def solveEquasion(equasion_as_list):                                            
         for missions in range(0,minus):                                             # for every counted dividation char
             missionCompleted = False                                                # declaring
             for index in range(0, len(equasion)):                                   # check every entry of the equasion
-                if missionCompleted == True:                                        # skipping if the compute-sign was already found in the current mission
+                if missionCompleted:                                                # skipping if the compute-sign was already found in the current mission
                     continue
                 else:                                                               # when this mission still have to find one compute-sign
-                    if equasion[index] == "/":                                      # executed when a minus char was found
+                    if equasion[index] == "-":                                      # executed when a minus char was found
                         subresult =  float(equasion[index-1]) - float(equasion[index+1])# subsracts the entry before and after the dividation char
                         equasion[index]= str(subresult)                             # replace the dividation char with the subresult
                         equasion.pop(index-1)                                       # remove the number entry which was in the calculation above
                         equasion.pop(index)                                         # remove the number entry which was in the calculation above
                         missionCompleted = True                                     # the compute-sign was solved so the next scanned indexed (above) will be skipped
-
     return equasion
+
+def compactSolve(equasion_as_string):                                               #combines all steft to solve an equasion in just one gunction
+    equasion_as_list = interpreteEquasion(equasion_as_string)
+    result = solveEquasion(equasion_as_list)
+    result = float(result[0])
+    if str(result)[-2] + str(result)[-1] == ".0":
+        result = int(result)
+    return result
 
 global variables                                                                    # global variable to save all custom ariable definitions
 variables = []
@@ -466,8 +465,7 @@ def setVariable(variable, value):
 
 
 if __name__ == "__main__":
-    setVariable("x", 2)
-    print(solveEquasion(interpreteEquasion("(-5)+(-6)+(-7)")))
+    showBanner()
     while True:
         print("")
-        print("f() = " ,solveEquasion(interpreteEquasion(str(input("enter equasion: "))))[0])
+        print("f() = ", compactSolve(str(input("Enter an equasion: "))))
