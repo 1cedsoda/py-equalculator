@@ -463,6 +463,13 @@ def setVariable(variable, value):
             variables.pop(index)
     variables.append([variable, value])                                             # write the difinition into the list
 
+global fuctions                                                                    # global variable to save all custom ariable definitions
+variables = []
+def setFuction(fuctionName, equasion_as_string):
+    for index in range(0, len(functions)):                                          # pop all other definition for this variable
+        if functions[index] == functionName:
+            variables.pop(index)
+    variables.append([fuctionName, equasion_as_string])                                             # write the difinition into the list
 
 if __name__ == "__main__":
     showBanner()
