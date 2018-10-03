@@ -4,8 +4,14 @@
 
 from interprete import interpreteEquasion
 from solve import solveEquasion
+from solve import replaceVars
 from type import getType
 import re
+from urllib.parse import quote
+import traceback
+import json
+
+version = "1.4"
 
 
 def showBanner():                                                                   # Cool Banner will be printed. Created with network-science.de/ascii/
@@ -15,7 +21,7 @@ def showBanner():                                                               
         print("     /  __/ /_/ // /_/ // /_/ /_  / / /__ / /_/ /_  / / /_/ // /_ / /_/ /  /")
         print("     \___/\__, / \__,_/ \__,_/ /_/  \___/ \__,_/ /_/  \__,_/ \__/ \____//_/")
         print("            /_/")
-        print("                   github.com/phyyyl/py-equalculator    v1.4 ")
+        print("                   github.com/phyyyl/py-equalculator    " + version)
 
 
 def inputPrompt():                                                                  # when executed the user is able to type in an equasion
@@ -25,6 +31,7 @@ def inputPrompt():                                                              
 
 class Term:
     def __init__(self, equasion_as_string, variables={}, loadVariablesFromHeap=False):
+        self.inputString = equasion_as_string
         if loadVariablesFromHeap:
             self.variables = variables
         else:
@@ -53,14 +60,31 @@ class Term:
         return allAvailable
 
     def calculate(self):
-        if __name__ == "__main__":
-            print("Interpreted:", "".join(self.equasion))
-        self.reqVars = self.requiredVariables()
-        if self.__checkVariableAvailability():
-            self.result = float(solveEquasion(self.equasion, self.variables)[0])
-        else:
-            self.result = None
-        return self.result
+        try:
+            if __name__ == "__main__":
+                print("   Interpreted :   ", self.equasion)
+                print("   InterpretedStr :", "".join(self.equasion))
+                print("   Variables :     ", json.dumps(self.variables, sort_keys=True, indent=2))
+            self.reqVars = self.requiredVariables()
+            if self.__checkVariableAvailability():
+                self.result = float(solveEquasion(replaceVars(self.equasion, self.variables))[0])
+            else:
+                self.result = None
+            return self.result
+        except Exception as e:
+            errorType = str(type(e))[8:-2]
+            tinyEquasion = "".join(self.equasion)
+            if len(tinyEquasion) > 20:
+                tinyEquasion = tinyEquasion[:17] + "..."
+            title = "calculate() " + errorType + " \"" + tinyEquasion + "\""
+            body = "Version: _**something for version identification**_\n \
+                Input : ```" + self.inputString + "```\n \
+                Interpreted : ```" + str(self.equasion) + "```\n \
+                Interpreted (string) : ```" + "".join(self.equasion) + "```\n \
+                Variables : \n```javascript\n" + json.dumps(self.variables, sort_keys=True, indent=2) + "\n```\n \
+                \nException : \n```python\n" + str(traceback.format_exc()) + "```"
+            issueLink = "https://github.com/phyyyl/py-equalculator/issues/new?title=" + quote(title, safe='') + "&body=" + quote(body, safe='')
+            print("\033[;1mReport Exception: \033[1;31m" + issueLink + "\033[0;0m")
 
     def __repr__(self):
         return str(self.result)
@@ -76,4 +100,4 @@ if __name__ == "__main__":
     showBanner()
     while True:
         print("")
-        print(Term(input("Enter an equasion: ")))
+        print(Term(input("Enter function: ")))

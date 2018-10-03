@@ -2,17 +2,20 @@ from type import getType
 import re
 
 
-def solveEquasion(equasion_as_list, variables={}):                                       # solving an equasion (recursive, because of brackets)
-    equasion = equasion_as_list                                                     # code will look cleaner with shorter variables
-
+def replaceVars(equasion_as_list, variables={}):
+    equasion = equasion_as_list.copy()
     # >>> replace vars <<<
     for n in range(len(equasion)):
         if equasion[n] in variables:
             equasion[n] = variables[equasion[n]]
+    return equasion
 
+
+def solveEquasion(equasion_as_list):                                       # solving an equasion (recursive, because of brackets)
+    equasion = equasion_as_list.copy()                                   # code will look cleaner with shorter variables
     # >>> solve brackets <<<
     bracket = 0
-    for n in range(len(equasion)):                                                  # every entry in the equasionlist will be checked for brackets
+    for n in range(len(equasion)):                                                      # every entry in the equasionlist will be checked for brackets
         if equasion[n] == "(":
             bracket = bracket + 1
         if equasion[n] == ")":
@@ -36,7 +39,7 @@ def solveEquasion(equasion_as_list, variables={}):                              
                         else:
                             for n in range(leftBracket + 1, rightBracket):          # every entry in between will be appendet to list, which will be recursed tho the solveEquasion() funcion
                                 subequasion.append(equasion[n])
-                        subresult = solveEquasion(subequasion, variables)           # recusing the subequasion to the solveEquasion() funcion
+                        subresult = solveEquasion(subequasion)           # recusing the subequasion to the solveEquasion() funcion
                         equasion[rightBracket] = (subresult)[0]                     # replacing the result with the right bracket
                         for n in range(leftBracket + 1, rightBracket + 1):          # poping the left bracket and everything inbetween the two brackets
                             equasion.pop(leftBracket)

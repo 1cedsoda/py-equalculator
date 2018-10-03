@@ -118,5 +118,15 @@ def interpreteEquasion(equasion_as_string):                                     
             except Exception:
                 continue
 
-    equasion_as_list = equasion                                                     # converting back to a longer variablename to keep an order
-    return equasion_as_list                                                         # the equasion interpreted to a list will get returned
+    # >>> 2() or x() -> 2*() or x*()
+    multiplyInstertionIndexes = []
+    for i in range(1, len(equasion)):
+        lasttype = getType(equasion[i - 1][-1])
+        currenttype = getType(equasion[i][0])
+        if currenttype == "bracket":
+            if lasttype == "number" or lasttype == "variable":
+                multiplyInstertionIndexes.append(i)
+    for i in multiplyInstertionIndexes:
+        equasion.insert(i, "*")
+
+    return equasion                                                                 # the equasion interpreted to a list will get returned
