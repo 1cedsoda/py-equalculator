@@ -5,8 +5,6 @@ import re
 def solveEquasion(equasion_as_list, variables={}):                                       # solving an equasion (recursive, because of brackets)
     equasion = equasion_as_list                                                     # code will look cleaner with shorter variables
 
-    print(equasion)
-
     # >>> replace vars <<<
     for n in range(len(equasion)):
         if equasion[n] in variables:

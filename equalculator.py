@@ -24,27 +24,25 @@ def inputPrompt():                                                              
 
 
 class Term:
-    def __init__(self, equasion_as_string, variables={}):
-        self.variables = variables.copy()
-        variables = None
-        self.equasion_as_list = interpreteEquasion(equasion_as_string)
-        self.reqVars = self.requiredVariables(self.equasion_as_list)
-        if self.checkVariableAvailability():
-            self.result = float(solveEquasion(self.equasion_as_list, self.variables)[0])
+    def __init__(self, equasion_as_string, variables={}, loadVariablesFromHeap=False):
+        if loadVariablesFromHeap:
+            self.variables = variables
         else:
-            self.result = None
+            self.variables = variables.copy()
+        self.equasion = interpreteEquasion(equasion_as_string)
+        self.calculate()
 
     def set(self, variable, value):
         self.variables[variable] = value
 
-    def requiredVariables(self, equasion):
+    def requiredVariables(self):
         reqVars = []
-        for segment in equasion:
+        for segment in self.equasion:
             if re.search('[a-zA-Z]', segment):
                 reqVars.append(segment)
         return reqVars
 
-    def checkVariableAvailability(self):
+    def __checkVariableAvailability(self):
         allAvailable = True
         for reqVar in self.reqVars:
             if reqVar not in self.variables:
@@ -53,6 +51,16 @@ class Term:
                 else:
                     allAvailable = False
         return allAvailable
+
+    def calculate(self):
+        if __name__ == "__main__":
+            print("Interpreted:", "".join(self.equasion))
+        self.reqVars = self.requiredVariables()
+        if self.__checkVariableAvailability():
+            self.result = float(solveEquasion(self.equasion, self.variables)[0])
+        else:
+            self.result = None
+        return self.result
 
     def __repr__(self):
         return str(self.result)
@@ -66,7 +74,6 @@ class Term:
 
 if __name__ == "__main__":
     showBanner()
-    t = 0
     while True:
         print("")
         print(Term(input("Enter an equasion: ")))
