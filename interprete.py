@@ -55,33 +55,7 @@ def interpreteEquasion(equasion_as_string):                                     
             stringFragment2 = ""
             stringFragment3 = ")"
 
-            if (currenttype == "variable") and (lastchar == "-"):
-                if (lastchar2 == "(") or (lasttype2 == "action") or (lasttype2 == "nothing"):  # detecting if the current index is an negative variable
-                    for lenght in range(i + 1, len(string) - i + 1):                      # scanning all chars after the variable
-                        if not variableInnterruption:
-                            if getType(string[lenght]) == "variable":
-                                variableLenght = variableLenght + 1                 # detecting the lenght of the variable
-                            else:
-                                variableInnterruption = True
-                        else:
-                            continue
-                    try:                                                            # now the equasion string will parted in thre fragments
-                        stringFragment1 = string[:i - 1] + "("
-                    except Exception:
-                        continue
-                    try:
-                        stringFragment2 = "$" + string[i:i + variableLenght]         # the negative minus char will be replaced by an $ sign
-                    except Exception:
-                        continue
-                    try:
-                        stringFragment3 = ")" + string[i + variableLenght:]
-                    except Exception:
-                        continue
-                    string = stringFragment1 + stringFragment2 + stringFragment3    # now the equasion string get assembled by thee fragments
-                    i = i + 1                                                       # part of the raged for(while) loop
-                    maxIndex = len(string) - 1                                        # updating the lenght of the string for the ranged for(while) loop
-
-            elif (currenttype == "number") and (lastchar == "-"):
+            if (currenttype == "number" or currenttype == "variable") and (lastchar == "-"):
                 if (lastchar2 == "(") or (lasttype2 == "action") or (lasttype2 == "nothing"):  # detecting if the current index is an negative number
                     for lenght in range(i + 1, len(string) - i + 1):                      # scanning all chars after the number
                         if not numberInterruption:

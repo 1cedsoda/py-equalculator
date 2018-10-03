@@ -4,6 +4,8 @@
 
 from interprete import interpreteEquasion
 from solve import solveEquasion
+from type import getType
+import re
 
 
 def showBanner():                                                                   # Cool Banner will be printed. Created with network-science.de/ascii/
@@ -13,7 +15,7 @@ def showBanner():                                                               
         print("     /  __/ /_/ // /_/ // /_/ /_  / / /__ / /_/ /_  / / /_/ // /_ / /_/ /  /")
         print("     \___/\__, / \__,_/ \__,_/ /_/  \___/ \__,_/ /_/  \__,_/ \__/ \____//_/")
         print("            /_/")
-        print("                   github.com/phyyyl/py-equalculator    v1.3 ")
+        print("                   github.com/phyyyl/py-equalculator    v1.4 ")
 
 
 def inputPrompt():                                                                  # when executed the user is able to type in an equasion
@@ -22,12 +24,35 @@ def inputPrompt():                                                              
 
 
 class Term:
-    def __init__(self, equasion_as_string):
+    def __init__(self, equasion_as_string, variables={}):
+        self.variables = variables.copy()
+        variables = None
         self.equasion_as_list = interpreteEquasion(equasion_as_string)
-        try:
-            self.result = float(solveEquasion(self.equasion_as_list)[0])
-        except:
+        self.reqVars = self.requiredVariables(self.equasion_as_list)
+        if self.checkVariableAvailability():
+            self.result = float(solveEquasion(self.equasion_as_list, self.variables)[0])
+        else:
             self.result = None
+
+    def set(self, variable, value):
+        self.variables[variable] = value
+
+    def requiredVariables(self, equasion):
+        reqVars = []
+        for segment in equasion:
+            if re.search('[a-zA-Z]', segment):
+                reqVars.append(segment)
+        return reqVars
+
+    def checkVariableAvailability(self):
+        allAvailable = True
+        for reqVar in self.reqVars:
+            if reqVar not in self.variables:
+                if __name__ == "__main__":
+                    self.variables[reqVar] = str(input(reqVar + " = "))
+                else:
+                    allAvailable = False
+        return allAvailable
 
     def __repr__(self):
         return str(self.result)
@@ -39,9 +64,9 @@ class Term:
         return int(self.result)
 
 
-
 if __name__ == "__main__":
     showBanner()
+    t = 0
     while True:
         print("")
-        print(Term(input("Enter an equasion: ")).result)
+        print(Term(input("Enter an equasion: ")))
